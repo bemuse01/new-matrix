@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                background: black;
+                overflow: hidden;
+            }
+            div#wrap{
+                position: absolute;
+                width: calc(100vw + 100vw / 2);
+                height: calc(100vh + 100vh / (2 * 100vh / 100vw));
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%)
+            }
+            div#canvas-wrap {
+                perspective: 1000px;
+            }
+            canvas {
+                display: block;
+                transform: rotateX(-30deg);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrap">
+            <div id="canvas-wrap">
+                <canvas id="c"></canvas>
+            </div>
+        </div>
+        <script>
+        var c = document.getElementById("c");
+        var ctx = c.getContext("2d");
+        let ratio = screen.height / screen.width
+
+        c.width = window.innerWidth + (window.innerWidth / 2)
+        c.height = window.innerHeight + (window.innerHeight / (2 * ratio))
+
+        var matrix = "`1234567890-=!@#$%^&*()_+qwertyuiop[]asdfghjkl;'zxcvbnm,./QWERTYUIOPASDFGHJKLZXCVBNM<>?;'\"\\|~";
+        matrix = matrix.split("");
+
+        var font_size = 10;
+        var columns = Math.floor(c.width / font_size) + Math.floor(c.height / font_size);
+        var drops = [];
+        for(var x = 0; x < columns; x++) drops[x] = x % 2 == 0 ? 0 : Math.floor(c.height / font_size) + 1; 
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+            ctx.fillRect(0, 0, c.width, c.height);
+
+            ctx.fillStyle = `hsl(179, 100%, 53%, 0.60)`//"#0ffffc"; 
+            ctx.font = font_size + "px arial";
+            for(var i = 0; i < drops.length; i++) {
+                var text = matrix[Math.floor(Math.random() * matrix.length)];
+                /*if(i < Math.floor(c.height / font_size)) ctx.fillText(text, drops[i] * font_size, i * font_size + drops[i] * font_size);
+                else ctx.fillText(text, (i - Math.floor(c.height / font_size) + 1) * font_size + drops[i] * font_size, drops[i] * font_size);*/
+                if(i % 2 == 0){
+                    ctx.fillText(text, (i - Math.floor(c.height / font_size)) * font_size + drops[i] * font_size, drops[i] * font_size);
+                    if(drops[i] * font_size > c.height && Math.random() > 0.9985) drops[i] = 0;
+                    drops[i]++;
+                }else{
+                    ctx.fillText(text, (i - Math.floor(c.height / font_size)) * font_size + drops[i] * font_size, drops[i] * font_size);
+                    if(drops[i] * font_size < 0 && Math.random() > 0.9985) drops[i] = Math.floor(c.height / font_size) + 1;
+                    drops[i]--;
+                }
+            }
+        }
+
+        function onWindowResize(){
+            c.width = window.innerWidth + (window.innerWidth / 2)
+            c.height = window.innerHeight + (window.innerHeight / (2 * ratio))
+        }
+
+        function animate(){
+            draw()
+            requestAnimationFrame(animate)
+        }
+        window.addEventListener('resize', onWindowResize, false)
+        animate()
+        </script>
+    </body>
+</html>
